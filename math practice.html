@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Speed Dash! ⚡</title>
+<style>
+  * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  body {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  h1 { margin-top: 0; color: #2a5298; font-size: 2rem; margin-bottom: 10px; }
+  .stats-bar {
+    display: flex;
+    justify-content: space-around;
+    background: #f0f4f8;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  .stat-item { display: flex; flex-direction: column; }
+  .stat-label { font-size: 0.75rem; text-transform: uppercase; color: #666; }
+  .stat-value { color: #2a5298; font-size: 1.3rem; }
+  
+  .controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid #2a5298;
+    background: #fff;
+    font-weight: bold;
+    color: #2a5298;
+    cursor: pointer;
+  }
+
+  .question-box {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #111;
+    margin: 20px 0;
+    letter-spacing: 2px;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  input[type="number"] {
+    font-size: 2rem;
+    width: 120px;
+    text-align: center;
+    border: 3px solid #2a5298;
+    border-radius: 12px;
+    outline: none;
+    padding: 5px;
+  }
+  input[type="number"]::-webkit-inner-spin-button, 
+  input[type="number"]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
+  .submit-btn {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: none;
+    background: #ff7b00;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .submit-btn:active { transform: scale(0.95); }
+
+  .mc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 15px;
+  }
+  .mc-btn {
+    font-size: 1.8rem;
+    font-weight: bold;
+    padding: 15px;
+    border-radius: 12px;
+    border: 3px solid #e0e0e0;
+    background: #f9f9f9;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .mc-btn:hover { background: #eef5ff; border-color: #2a5298; }
+  .mc-btn:active { transform: scale(0.97); }
+
+  .feedback {
+    height: 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  .correct { color: #2e7d32; }
+  .wrong { color: #c62828; }
+
+  .streak-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ffcc00;
+    color: #000;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: none;
+  }
+
+  .sound-toggle {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    color: #777;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="streak-badge" id="streakBadge">🔥 5 IN A ROW!</div>
+  <h1>Math Speed Dash ⚡</h1>
+  
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-label">Score</span>
+      <span class="stat-value" id="score">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Streak</span>
+      <span class="stat-value" id="streak">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Best</span>
+      <span class="stat-value" id="bestStreak">0</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <select id="modeSelect" onchange="changeMode()">
+      <option value="type">Mode: Type Answer</option>
+      <option value="mc">Mode: Multiple Choice</option>
+    </select>
+    <select id="rangeSelect" onchange="resetGame()">
+      <option value="12">Tables: 1 - 12</option>
+      <option value="10">Tables: 1 - 10</option>
+      <option value="5">Tables: 1 - 5</option>
+    </select>
+  </div>
+
+  <div class="question-box" id="question">4 × 2</div>
+
+  <div id="typeModeContainer">
+    <form id="answerForm" onsubmit="handleTypeSubmit(event)">
+      <div class="input-group">
+        <input type="number" id="typeInput" autocomplete="off" autofocus placeholder="?">
+        <button type="submit" class="submit-btn">GO 🚀</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="mcModeContainer" class="mc-grid" style="display: none;">
+    <button class="mc-btn" onclick="checkMcAnswer(this)"></button>
+    <button class="mc-btn" onclick="checkMcAnswer(this)"></button>
+    <button class="mc-btn" onclick="checkMcAnswer(this)"></button>
+    <button class="mc-btn" onclick="checkMcAnswer(this)"></button>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+  <div class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊 Sound: ON</div>
+</div>
+
+<script>
+  let score = 0;
+  let streak = 0;
+  let bestStreak = 0;
+  let num1 = 0;
+  let num2 = 0;
+  let correctAnswer = 0;
+  let soundEnabled = true;
+
+  // Web Audio API Synthesizer (No external sound files required)
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playSound(type) {
+    if (!soundEnabled) return;
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const now = audioCtx.currentTime;
+
+    if (type === 'correct') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.16);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else if (type === 'streak') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } else {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    }
+  }
+
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    document.getElementById('soundToggle').innerText = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+  }
+
+  function generateQuestion() {
+    const maxRange = parseInt(document.getElementById('rangeSelect').value);
+    num1 = Math.floor(Math.random() * maxRange) + 1;
+    num2 = Math.floor(Math.random() * maxRange) + 1;
+    correctAnswer = num1 * num2;
+
+    document.getElementById('question').innerText = `${num1} × ${num2}`;
+
+    const mode = document.getElementById('modeSelect').value;
+    if (mode === 'type') {
+      const input = document.getElementById('typeInput');
+      input.value = '';
+      input.focus();
+    } else {
+      setupMultipleChoice();
+    }
+  }
+
+  function setupMultipleChoice() {
+    const maxRange = parseInt(document.getElementById('rangeSelect').value);
+    let options = [correctAnswer];
+
+    while (options.length < 4) {
+      let wrong;
+      const optionType = Math.floor(Math.random() * 2);
+      if (optionType === 0) {
+        wrong = (num1 + (Math.random() < 0.5 ? 1 : -1)) * num2;
+      } else {
+        wrong = num1 * (num2 + (Math.random() < 0.5 ? 1 : -1));
+      }
+
+      if (wrong > 0 && !options.includes(wrong)) {
+        options.push(wrong);
+      }
+    }
+
+    options.sort(() => Math.random() - 0.5);
+
+    const buttons = document.querySelectorAll('.mc-btn');
+    buttons.forEach((btn, idx) => {
+      btn.innerText = options[idx];
+      btn.disabled = false;
+      btn.style.backgroundColor = '#f9f9f9';
+      btn.style.borderColor = '#e0e0e0';
+    });
+  }
+
+  function handleTypeSubmit(e) {
+    e.preventDefault();
+    const input = document.getElementById('typeInput');
+    const val = parseInt(input.value);
+
+    if (isNaN(val)) return;
+
+    if (val === correctAnswer) {
+      onCorrect();
+    } else {
+      onWrong(`${num1} × ${num2} = ${correctAnswer}`);
+    }
+  }
+
+  function checkMcAnswer(btn) {
+    const chosen = parseInt(btn.innerText);
+    if (chosen === correctAnswer) {
+      btn.style.backgroundColor = '#c8e6c9';
+      onCorrect();
+    } else {
+      btn.style.backgroundColor = '#ffcdd2';
+      onWrong(`${num1} × ${num2} = ${correctAnswer}`);
+    }
+  }
+
+  function onCorrect() {
+    score += 10;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+
+    const feedbackEl = document.getElementById('feedback');
+    const compliments = ["BOOM! 💥", "NAILED IT! 🎯", "AWESOME! ⭐", "SPEED DEMON! ⚡", "GREAT JOB! 🚀"];
+    const randomMsg = compliments[Math.floor(Math.random() * compliments.length)];
+    
+    feedbackEl.innerText = randomMsg;
+    feedbackEl.className = "feedback correct";
+
+    if (streak % 5 === 0) {
+      playSound('streak');
+      showStreakBadge(`${streak} IN A ROW! 🔥`);
+    } else {
+      playSound('correct');
+    }
+
+    updateStats();
+    setTimeout(generateQuestion, 350);
+  }
+
+  function onWrong(correctText) {
+    streak = 0;
+    const feedbackEl = document.getElementById('feedback');
+    feedbackEl.innerText = `Oops! ${correctText}`;
+    feedbackEl.className = "feedback wrong";
+    playSound('wrong');
+    updateStats();
+    setTimeout(generateQuestion, 1200);
+  }
+
+  function showStreakBadge(text) {
+    const badge = document.getElementById('streakBadge');
+    badge.innerText = text;
+    badge.style.display = 'block';
+    setTimeout(() => { badge.style.display = 'none'; }, 1800);
+  }
+
+  function updateStats() {
+    document.getElementById('score').innerText = score;
+    document.getElementById('streak').innerText = streak;
+    document.getElementById('bestStreak').innerText = bestStreak;
+  }
+
+  function changeMode() {
+    const mode = document.getElementById('modeSelect').value;
+    if (mode === 'type') {
+      document.getElementById('typeModeContainer').style.display = 'block';
+      document.getElementById('mcModeContainer').style.display = 'none';
+    } else {
+      document.getElementById('typeModeContainer').style.display = 'none';
+      document.getElementById('mcModeContainer').style.display = 'grid';
+    }
+    generateQuestion();
+  }
+
+  function resetGame() {
+    score = 0;
+    streak = 0;
+    updateStats();
+    generateQuestion();
+  }
+
+  generateQuestion();
+</script>
+</body>
+</html>
