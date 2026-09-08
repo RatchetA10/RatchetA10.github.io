@@ -11,16 +11,16 @@
   body {
     background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
     min-height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; color: #333;
-    transition: background 0.5s ease;
+    transition: background 0.4s ease;
   }
   
-  /* Hot Pink Theme! */
+  /* HOTTEST PINK MODE 8-year-old approved 🔥🌸 */
   body.pink-mode {
-    background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
+    background: linear-gradient(135deg, #b3003b 0%, #ff0055 50%, #ff007f 100%);
   }
 
   .card {
-    background: #ffffff; border-radius: 20px; padding: 30px; width: 95%; max-width: 600px;
+    background: #ffffff; border-radius: 20px; padding: 30px; width: 95%; max-width: 650px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; position: relative;
   }
   
@@ -29,11 +29,12 @@
   /* Theme Toggle Button */
   .theme-btn {
     position: absolute; top: 15px; right: 15px;
-    background: #ff0844; color: white; border: none; padding: 8px 15px;
-    border-radius: 20px; font-weight: bold; cursor: pointer;
-    box-shadow: 0 3px 0 #c2002f; transition: all 0.1s;
+    background: #ff0055; color: white; border: none; padding: 10px 18px;
+    border-radius: 20px; font-weight: 900; cursor: pointer;
+    box-shadow: 0 4px 0 #990033; transition: all 0.1s;
+    letter-spacing: 0.5px;
   }
-  .theme-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #c2002f; }
+  .theme-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #990033; }
 
   .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
   select {
@@ -47,21 +48,21 @@
   }
   
   .math-grid {
-    display: grid; gap: 5px 10px; align-items: center; justify-items: center;
+    display: grid; gap: 5px 8px; align-items: center; justify-items: center;
   }
 
   /* The little inputs above the numbers for carrying/borrowing */
   .scratch-input {
-    width: 40px; height: 40px; text-align: center; font-size: 1.2rem; font-weight: bold;
+    width: 42px; height: 42px; text-align: center; font-size: 1.2rem; font-weight: bold;
     border: 2px dashed #aaa; border-radius: 8px; background: #f9f9f9; color: #d32f2f;
     outline: none;
   }
-  .scratch-input:focus { border-color: #d32f2f; background: #fff; }
+  .scratch-input:focus { border-color: #ff0055; background: #fff; }
 
   /* The actual numbers */
   .digit-cell {
     font-size: 3.5rem; font-weight: 800; cursor: pointer; user-select: none;
-    transition: all 0.2s; position: relative; width: 50px; text-align: center;
+    transition: all 0.2s; position: relative; width: 48px; text-align: center;
   }
   .digit-cell:hover::after {
     content: "cross out"; position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
@@ -70,25 +71,25 @@
   
   /* Strike-through effect when clicked */
   .digit-cell.strike {
-    color: #999;
+    color: #a0a0a0;
   }
   .digit-cell.strike::before {
     content: ""; position: absolute; top: 50%; left: -5px; right: -5px;
-    height: 4px; background: red; transform: rotate(-15deg);
+    height: 5px; background: #ff0055; transform: rotate(-15deg); border-radius: 2px;
   }
   .digit-cell.strike:hover::after { display: none; }
 
-  .operator-cell { font-size: 3rem; font-weight: 800; margin-right: 10px; }
+  .operator-cell { font-size: 3rem; font-weight: 800; margin-right: 5px; }
   
   /* Divider line before answer */
   .divider { grid-column: 1 / -1; width: 100%; height: 5px; background: #111; border-radius: 5px; margin: 10px 0; }
 
   /* Bottom answer inputs */
   .ans-input {
-    width: 50px; height: 60px; text-align: center; font-size: 2.5rem; font-weight: bold;
+    width: 48px; height: 60px; text-align: center; font-size: 2.5rem; font-weight: bold;
     border: 3px solid #333; border-radius: 10px; outline: none;
   }
-  .ans-input:focus { border-color: #2196f3; box-shadow: 0 0 10px rgba(33,150,243,0.3); }
+  .ans-input:focus { border-color: #ff0055; box-shadow: 0 0 10px rgba(255, 0, 85, 0.4); }
 
   .submit-btn {
     font-size: 1.5rem; padding: 12px 30px; border-radius: 12px; border: none;
@@ -109,7 +110,7 @@
 <body>
 
 <div class="card">
-  <button class="theme-btn" onclick="togglePinkMode()">🌸 PINK MODE</button>
+  <button class="theme-btn" onclick="togglePinkMode()">🔥 HOT PINK MODE</button>
   <h1>Math Scratchpad 📝</h1>
   <div class="instructions">Need to borrow or carry? Type in the boxes up top. Click a number to cross it out!</div>
   
@@ -121,7 +122,7 @@
     <select id="digitSelect" onchange="generateProblem()">
       <option value="2">2 Digits (e.g. 45)</option>
       <option value="3">3 Digits (e.g. 345)</option>
-      <option value="4">4 Digits (e.g. 8947)</option>
+      <option value="4" selected>4 Digits (e.g. 8947)</option>
     </select>
   </div>
 
@@ -135,7 +136,7 @@
 
 <script>
   let currentAnswer = 0;
-  let numColumns = 0;
+  let numAnsColumns = 0;
 
   function togglePinkMode() {
     document.body.classList.toggle('pink-mode');
@@ -143,11 +144,11 @@
     if (document.body.classList.contains('pink-mode')) {
       btn.innerText = "🌌 BLUE MODE";
       btn.style.background = "#1e3c72";
-      btn.style.boxShadow = "0 3px 0 #11254d";
+      btn.style.boxShadow = "0 4px 0 #11254d";
     } else {
-      btn.innerText = "🌸 PINK MODE";
-      btn.style.background = "#ff0844";
-      btn.style.boxShadow = "0 3px 0 #c2002f";
+      btn.innerText = "🔥 HOT PINK MODE";
+      btn.style.background = "#ff0055";
+      btn.style.boxShadow = "0 4px 0 #990033";
     }
   }
 
@@ -160,14 +161,13 @@
     const digits = parseInt(document.getElementById('digitSelect').value);
     const op = document.getElementById('opSelect').value;
 
-    // Generate max/min based on digit selection (e.g., 2 digits = 10 to 99)
     const min = Math.pow(10, digits - 1);
     const max = Math.pow(10, digits) - 1;
 
     let n1 = Math.floor(Math.random() * (max - min + 1)) + min;
     let n2 = Math.floor(Math.random() * (max - min + 1)) + min;
 
-    // If subtraction, ensure top number is larger to avoid negative answers for 8yo
+    // Ensure subtraction yields non-negative results
     if (op === '-' && n2 > n1) {
       let temp = n1; n1 = n2; n2 = temp;
     }
@@ -178,25 +178,26 @@
   }
 
   function renderGrid(str1, str2, op) {
-    const maxLen = Math.max(str1.length, str2.length) + 1; // +1 for the operator column
-    numColumns = maxLen - 1; // Number of digit columns
+    // Addition allows 1 extra digit box on the left for carries into a new place value
+    numAnsColumns = op === '+' ? Math.max(str1.length, str2.length) + 1 : Math.max(str1.length, str2.length);
+    const totalGridCols = numAnsColumns + 1; // +1 extra column for operator symbol on far left
     
-    // Pad numbers with spaces so they align properly on the right
-    str1 = str1.padStart(maxLen - 1, ' ');
-    str2 = str2.padStart(maxLen - 1, ' ');
+    // Pad top and bottom numbers so digits align right
+    const paddedStr1 = str1.padStart(numAnsColumns, ' ');
+    const paddedStr2 = str2.padStart(numAnsColumns, ' ');
 
-    let html = `<div class="math-grid" style="grid-template-columns: repeat(${maxLen}, auto);">`;
+    let html = `<div class="math-grid" style="grid-template-columns: repeat(${totalGridCols}, auto);">`;
 
     // ROW 1: Scratchpad (Carries/Borrows)
     html += `<div></div>`; // Empty space over operator
-    for (let i = 0; i < maxLen - 1; i++) {
+    for (let i = 0; i < numAnsColumns; i++) {
       html += `<input type="text" maxlength="2" class="scratch-input" autocomplete="off">`;
     }
 
     // ROW 2: Top Number
     html += `<div></div>`; // Empty space over operator
-    for (let i = 0; i < maxLen - 1; i++) {
-      let char = str1[i];
+    for (let i = 0; i < numAnsColumns; i++) {
+      let char = paddedStr1[i];
       if (char !== ' ') {
         html += `<div class="digit-cell" onclick="toggleStrike(this)">${char}</div>`;
       } else {
@@ -206,8 +207,8 @@
 
     // ROW 3: Operator + Bottom Number
     html += `<div class="operator-cell">${op}</div>`;
-    for (let i = 0; i < maxLen - 1; i++) {
-      let char = str2[i];
+    for (let i = 0; i < numAnsColumns; i++) {
+      let char = paddedStr2[i];
       if (char !== ' ') {
         html += `<div class="digit-cell">${char}</div>`;
       } else {
@@ -220,22 +221,20 @@
 
     // ROW 4: Answer Inputs
     html += `<div></div>`; // Empty space under operator
-    for (let i = 0; i < maxLen - 1; i++) {
+    for (let i = 0; i < numAnsColumns; i++) {
       html += `<input type="text" maxlength="1" class="ans-input" id="ans-${i}" oninput="focusNext(event, ${i})" autocomplete="off">`;
     }
 
     html += `</div>`;
     document.getElementById('workspace').innerHTML = html;
 
-    // Auto-focus the right-most answer box to start
+    // Focus rightmost box (ones place)
     setTimeout(() => {
-      document.getElementById(`ans-${numColumns - 1}`).focus();
+      document.getElementById(`ans-${numAnsColumns - 1}`).focus();
     }, 100);
   }
 
-  // Right-to-Left Auto Focus for Answer row
   function focusNext(event, currentIndex) {
-    // If they type a number, jump to the box to the left
     if (event.target.value.length === 1 && currentIndex > 0) {
       document.getElementById(`ans-${currentIndex - 1}`).focus();
     }
@@ -243,12 +242,12 @@
 
   function checkAnswer() {
     let userAnswerStr = '';
-    for (let i = 0; i < numColumns; i++) {
+    for (let i = 0; i < numAnsColumns; i++) {
       let val = document.getElementById(`ans-${i}`).value;
-      userAnswerStr += val === '' ? '0' : val; // Treat blanks as leading zeros if they skipped the front box
+      userAnswerStr += val === '' ? '0' : val;
     }
 
-    const userAnswer = parseInt(userAnswerStr);
+    const userAnswer = parseInt(userAnswerStr, 10);
     const feedback = document.getElementById('feedback');
 
     if (userAnswer === currentAnswer) {
@@ -261,14 +260,12 @@
     }
   }
 
-  // Allow pressing Enter to check answer
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
       checkAnswer();
     }
   });
 
-  // Start the first problem
   generateProblem();
 </script>
 </body>
